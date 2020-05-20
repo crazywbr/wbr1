@@ -2,9 +2,11 @@ import React, { Component } from 'react'
 import { Text, View ,FlatList, Button, Image, StyleSheet} from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 const Stack = createStackNavigator();
+const SettingsStack = createStackNavigator();
 
 class Home extends React.Component {
   constructor(props){
@@ -21,20 +23,33 @@ componentDidMount(){
     })
 }
 
+_goDetails=()=>{
+  this.props.navigation.navigate("Details")
+}
+
+_del=id=>{
+  let data=this.state.albums.splice(0)
+  let index=data.findIndex(album=>album.id===id)
+  data.splice(index,1)
+  this.setState({albums:data})
+}
+
 _renderItem=({item})=>{
     return (
-        <View style={{flexDirection:"row",margin:3,width:'100%'}}>
+        <View style={style.container}>
+          <TouchableOpacity style={style.container} onPress={this._goDetails}>
             <View style={style.Lone}>
-              <Text style={{color:'red',fontSize:20}} >{item.id}</Text>
+              <Text style={{color:'red',fontSize:20}}>{item.id}</Text>
             </View>
             <View>
               <Image style={style.Ltwo} source={{uri:item.img}} />
             </View>
             <View style={style.Rthree}>
               <Text style={style.Rthree}>{item.name}</Text>
-            </View>   
+            </View>
+            </TouchableOpacity>   
             <View style={style.Rfour}>
-            <Button title="删除"/>
+            <Button title="删除" onPress={()=>this._del(item.id)}/>
             </View>
         </View>
     )
@@ -72,9 +87,17 @@ _reachEnd=()=>{
 
   }
 }
-function Detail({Navigation}){
-
+class Details extends React.Component{
+  render(){
+    return (
+      <SettingsStack.Navigator initialRouteName="详情">
+        <SettingsStack.Screen name="BlueTooth" component={BlueTooth}/>
+        <Stack.Screen name="流行音乐排行榜" component={Home}/>
+      </SettingsStack.Navigator>
+    )
+  }
 }
+
 
 export default class App extends Component {
 
@@ -87,6 +110,7 @@ export default class App extends Component {
             <NavigationContainer>
               <Stack.Navigator>
                 <Stack.Screen name="流行音乐排行榜" component={Home}/>
+                <Stack.Screen name="详情" component={Details}/>
               </Stack.Navigator>
             </NavigationContainer>
 
@@ -96,10 +120,15 @@ export default class App extends Component {
 }
 
 const style = StyleSheet.create({
+    container:{
+      flexDirection:"row",
+      margin:3,
+      width:'100%'
+    },
     Lone:{
-        width:25,
-        height:70,
-        flexDirection:'row'
+      width:25,
+      height:70,
+      flexDirection:'row'
     },
     Ltwo:{
       flexDirection:'column',
